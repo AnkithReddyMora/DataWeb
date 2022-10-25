@@ -4,7 +4,10 @@ from bottle import default_app, route
 
 @route('/')
 def hello_world():
-    return 'Hello from Bottle!'
+    return 'ANkith loves NASA gang'
+@route('/bye')
+def bye_world():
+    return 'ankith loves kavsssss'
 
 application = default_app()
 
