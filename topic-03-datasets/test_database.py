@@ -1,18 +1,6 @@
-# database.py - functions for managing database
+# test_database.py - functions for testing database.py
 
-import sqlite3
-
-connection = sqlite3.connect("shopping_list.db")
-
-def get_items(id=None):
-    cursor = connection.cursor()
-    if id:
-        items = cursor.execute(f"select id, description from list where id={id}")
-    else:
-        items = cursor.execute("select id, description from list")
-    items = list(items)
-    items = [ {'id':item[0] ,'desc':item[1]} for item in items ]
-    return items
+from dataset_database import get_items, add_item, delete_item, update_item
 
 def test_get_items():
     print("testing get_items...")
@@ -21,15 +9,18 @@ def test_get_items():
     assert len(items) > 0
     assert type(items[0]) is dict
     assert 'id' in items[0].keys()
-    assert 'desc' in items[0].keys()
+    assert 'description' in items[0].keys()
     assert type(items[0]['id']) is int
-    assert type(items[0]['desc']) is str
-    pass
+    assert type(items[0]['description']) is str
+    items = get_items(id=1)
+    assert type(items) is list
+    assert len(items) == 1
+    assert type(items[0]) is dict
+    assert 'id' in items[0].keys()
+    assert 'description' in items[0].keys()
+    assert type(items[0]['id']) is int
+    assert type(items[0]['description']) is str
 
-def add_item(description):
-    cursor = connection.cursor()
-    cursor.execute(f"insert into list (description) values ('{description}')")
-    connection.commit()
 
 import time
 
@@ -42,12 +33,8 @@ def test_add_item():
     add_item(description)
     items = get_items()
     item = items[-1]
-    assert description == item['desc']
-
-def delete_item(id):
-    cursor = connection.cursor()
-    cursor.execute(f"delete from list where id={id}")
-    connection.commit()
+    assert description == item['description']
+    delete_item(item['id'])
 
 def test_delete_item():
     print("testing delete_item...")
@@ -55,16 +42,11 @@ def test_delete_item():
     add_item(description)
     items = get_items()
     item = items[-1]
-    assert description == item['desc']
+    assert description == item['description']
     delete_item(item['id'])
     items = get_items()
     for item in items:
-        assert description != item['desc']
-
-def update_item(id, description):
-    cursor = connection.cursor()
-    cursor.execute(f"update list set description='{description}' where id={id}")
-    connection.commit()
+        assert description != item['description']
 
 def test_update_item():
     print("testing update_item...")
@@ -73,16 +55,17 @@ def test_update_item():
     items = get_items()
     item = items[-1]
     id = str(item['id'])
-    description = item['desc']
+    description = item['description']
     new_description = description.replace("1","9").replace(".",":")
     update_item(id, new_description)
     items = get_items()
     new_found = False
     for item in items:
         if item['id'] == int(id):
-            assert item['desc'] == new_description
+            assert item['description'] == new_description
+            delete_item(item['id'])
             new_found = True
-        assert item['desc'] != description
+        assert item['description'] != description
     assert new_found
 
 if __name__ == "__main__":
@@ -91,5 +74,6 @@ if __name__ == "__main__":
     test_delete_item()
     test_update_item()
     print("done.")
+
 
 

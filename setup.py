@@ -17,3 +17,5 @@ cursor.execute("insert into list (description) values ('danon')")
 cursor.execute("insert into list (description) values ('bread')")
 connection.commit()
 connection.close()
+
+print("done")
